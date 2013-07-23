@@ -23,8 +23,9 @@ complex_vertex {
 algorithm for min cut:
 
 (1) pick random edge (1,2)
-(2) contract vertices 1 and 2
-	- create complex_vertex with num_vertices++, and list of verticies including 1 and 2 (adopt first vertex id as id of whole)
+(2) contract vertices 1 and 2 (based on random edge (1,2))
+	- create fuxed_vertex, and list of verticies including 1 and 2 (adopt first vertex id as id of whole)
+        //- remove edge (1,2) from vertices 1 and 2
 	- remove vertices 1 and 2 from list of vertices
 	- add complex_vertex to list of vertices
 	- change 2 in all edges to be 1 (id of first vertex adopted as id of whole)
