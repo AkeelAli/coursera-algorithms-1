@@ -1,0 +1,32 @@
+list of edges
+list of vertices
+
+edge {
+	id1
+	id2
+}
+
+complex_vertex {
+	num vertices
+	list of vertices ids
+	list of edges
+}
+
+
+(0) build list of edges and verticies:
+	- read line by line (vertex by vertex)
+	- create a vertex, create edges, 
+		add edges to vertex, 
+		if edge with larger num: add edge to list of edges, 
+		add vertex to list of vertices
+
+algorithm for min cut:
+
+(1) pick random edge (1,2)
+(2) contract vertices 1 and 2
+	- create complex_vertex with num_vertices++, and list of verticies including 1 and 2 (adopt first vertex id as id of whole)
+	- remove vertices 1 and 2 from list of vertices
+	- add complex_vertex to list of vertices
+	- change 2 in all edges to be 1 (id of first vertex adopted as id of whole)
+		- while changing, if edge is (1,1), then delete (self-edge)
+
