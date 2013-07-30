@@ -2,7 +2,7 @@ class Node:
     
     def __init__(self, node_id):
         self.node_id = node_id
-        self.is_explored = 0
+        self.is_explored = False
         self.finishing_time = -1
         self.leader_id = -1
         self.edge_ids = [] #outgoing edges
@@ -43,15 +43,19 @@ class Graph:
         
         return string
 
-def build_graph(filename):
+def build_graph(filename, reverse):
     graph = Graph()
 
     f = open(filename, 'r')
 
     lines = f.readlines();
     for line in lines:
-        tail_id = int(line.split(' ')[0])
-        head_id = int(line.split(' ')[1])
+        if reverse:
+            head_id = int(line.split(' ')[0])
+            tail_id = int(line.split(' ')[1])
+        else:
+            tail_id = int(line.split(' ')[0])
+            head_id = int(line.split(' ')[1])
 
         if graph.contains_node(tail_id):
             graph.node_hash[tail_id].add_edge(head_id)
@@ -71,7 +75,107 @@ def build_graph(filename):
 
     return graph
 
+def DFS(graph, node_id):
+    global finishing_time
+    #
+    #global graph_update
+    global node_ids_by_finishing_time
+    #
 
-graph = build_graph('sample.txt')
+    node = graph.node_hash[node_id]
+    node.is_explored = True
+    node.leader_id = source
+    #
+    #graph_update.node_hash[node_id].leader_id = source
+    #
 
-print graph
+    for edge_id in node.edge_ids:
+        edge_node = graph.node_hash[edge_id]
+        if not edge_node.is_explored:
+            DFS(graph, edge_id)
+
+    finishing_time += 1
+    node.finishing_time = finishing_time
+    #print "%d finished" % node_id
+    #
+    #graph_update.node_hash[node_id].finishing_time = finishing_time
+    node_ids_by_finishing_time.append(node_id)
+    #
+
+
+def Kosaraju(graph, ordered_id_list = None):
+    global source
+
+    graph_size = len(graph.node_hash)
+    if ordered_id_list:
+        for i in reversed(ordered_id_list):
+            node = graph.node_hash[i]
+            if not node.is_explored:
+                source = i
+                DFS(graph, i)
+
+    else:
+
+        for i in range(graph_size, 0, -1):
+            node = graph.node_hash[i]
+            if not node.is_explored:
+                #print "processing %d" % i
+                source = i
+                DFS(graph, i)
+
+
+def group_by_leaders(graph):
+    #list indexed by leader_id and giving you number of followers part of the scc
+    leaders = []
+    leaders.append(0) #leader_id 0 does not exist
+
+    for i in range(1, len(graph.node_hash)+1):
+        leaders.append(0)
+
+    for node_id in graph.node_hash:
+        leader_id = graph.node_hash[node_id].leader_id
+        leaders[leader_id] += 1
+
+    return leaders
+
+def find_min(largest_list):
+    minimum = 0
+    for i in largest_list:
+        if i < minimum:
+            minimum = i
+    return minimum
+
+def find_largest_sccs(leaders_list, num):
+    min_accepted = 0
+    largest = []
+
+    for size in leaders_list:
+        if len(largest) < num:
+            largest.append(size)
+            min_accepted = find_min(largest)
+        else:
+            if size > min_accepted:
+                largest[largest.index(min_accepted)] = size
+                min_accepted = find_min(largest)
+
+    return largest
+
+
+
+
+#graph_update is the actual graph that we update during the first DFS on the graph_rev
+graph = build_graph('sample.txt', False)
+graph_rev = build_graph('sample.txt', True)
+
+finishing_time = 0
+source = 0
+node_ids_by_finishing_time = []
+
+Kosaraju(graph_rev)
+Kosaraju(graph, node_ids_by_finishing_time)
+
+leaders = group_by_leaders(graph)
+
+print find_largest_sccs(leaders, 5)
+
+
