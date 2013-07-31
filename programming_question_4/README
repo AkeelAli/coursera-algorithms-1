@@ -1,0 +1,7 @@
+python scc.py
+python scc2.py
+
+This splits the two DFS passes over two python scripts for speed-up
+
+Simply change the txt file read in both scripts to take a different input
+(Currently input is set to SCC.txt)

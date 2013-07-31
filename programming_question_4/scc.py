@@ -1,3 +1,8 @@
+import resource
+import sys
+resource.setrlimit(resource.RLIMIT_STACK, (2**29, 2**30))
+sys.setrecursionlimit(10**6)
+
 class Node:
     
     def __init__(self, node_id):
@@ -139,7 +144,7 @@ def group_by_leaders(graph):
     return leaders
 
 def find_min(largest_list):
-    minimum = 0
+    minimum = largest_list[0]
     for i in largest_list:
         if i < minimum:
             minimum = i
@@ -163,19 +168,32 @@ def find_largest_sccs(leaders_list, num):
 
 
 
-#graph_update is the actual graph that we update during the first DFS on the graph_rev
-graph = build_graph('sample.txt', False)
-graph_rev = build_graph('sample.txt', True)
+graph = build_graph('SCC.txt', True)
+print "Finished building graph rev"
 
 finishing_time = 0
 source = 0
 node_ids_by_finishing_time = []
 
-Kosaraju(graph_rev)
-Kosaraju(graph, node_ids_by_finishing_time)
+Kosaraju(graph)
+print "Finished first Kosaraju pass"
 
-leaders = group_by_leaders(graph)
+f = open('node_ids_by_finishing_time.txt','w')
 
-print find_largest_sccs(leaders, 5)
+for node_id in node_ids_by_finishing_time:
+    f.write(str(node_id))
+    f.write(str('\n'))
+
+f.close()
+
+#graph = build_graph('SCC.txt', False)
+#print "Finished building graph"
+
+#Kosaraju(graph, node_ids_by_finishing_time)
+#print "Finished second Kosaraju pass"
+
+#leaders = group_by_leaders(graph)
+
+#print find_largest_sccs(leaders, 5)
 
 
